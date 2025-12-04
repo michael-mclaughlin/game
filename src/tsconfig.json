@@ -7,6 +7,11 @@
       "dom.iterable",
       "esnext"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "components/*"]
+    },
+    "rootDirs": ["src/components", "src/components/items", "src/components/layout", "src/components/secondary"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,11 +23,23 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+  },
+  "rules": {
+    "react/jsx-filename-extension": [
+      1,
+      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
+    ]
   },
   "include": [
-    "src/**/*"
+    "src/**/*.ts", // Includes all TypeScript files in the 'src' directory and its subdirectories
+    "src/**/*.d.ts", // Includes all declaration files in the 'src' directory and its subdirectories
+    "src/**/*.tsx", // Includes all TypeScript React files in the 'src' directory and its subdirectories (if applicable)
+    "src/components/items/**/*.tsx",
+    "src/components/layout/**/*.tsx",
+    "src/components/secondary/**/*.tsx",
   ],
   "exclude": [
     "node_modules",

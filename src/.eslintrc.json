@@ -1,0 +1,13 @@
+{"settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".json",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    }
+  }
+}
