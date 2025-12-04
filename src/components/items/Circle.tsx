@@ -6,7 +6,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import styled from "styled-components";
+import styled, {css, keyframes} from "styled-components";
 
 interface CircleProps {
   children?: ReactElement;
@@ -16,6 +16,8 @@ interface CircleProps {
 
 interface BubbleProps {
   $paused?: boolean;
+  animationDuration?: string;
+  animationTimingFunction?: string;
 }
 
 const Timer: React.FC = () => {
@@ -54,7 +56,7 @@ const Timer: React.FC = () => {
 };
 
 const Circle: React.FC<CircleProps> = (props: CircleProps) => {
-  const { customClass, id } = props;
+  const { id } = props;
   const [bubbles, setBubbles] = useState<ReactNode[]>([]);
   const [isBgColor, setBgColor] = useState<string>("pink");
   const [isBorderColor, setIsBorderColor] = useState<string>("#2b78e4");
@@ -70,35 +72,6 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     return Math.floor(Math.ceil(Math.random() * max) * 10);
   }
   let str = getRandomInt(10);
-  let score: number = 0;
-
-  const theScore = () => {
-    switch (str) {
-      case 100:
-        return score = 1;
-      case 90:
-        return score = 2;
-      case 80:
-        return score = 3;
-      case 70:
-        return score = 4;
-      case 60:
-        return score = 5;
-      case 50:
-        return score = 6;
-      case 40:
-        return score = 7;
-      case 30:
-        return score = 8;
-      case 20:
-        return score = 9;
-      case 10:
-        return score = 10;
-      default:
-        return score;
-    }
-  };
-  
 
   function generateRandomUUID(): string {
     if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -138,32 +111,61 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     const Item = ({ id, $paused, removeDiv }) => {
       const [isVisible, setIsVisible] = useState<boolean>(true);
 
+      const theScore = useCallback(() => {
+        let score: number = 0;
+
+        switch (str) {
+          case 100:
+            return score = 1;
+          case 90:
+            return score = 2;
+          case 80:
+            return score = 3;
+          case 70:
+            return score = 4;
+          case 60:
+            return score = 5;
+          case 50:
+            return score = 6;
+          case 40:
+            return score = 7;
+          case 30:
+            return score = 8;
+          case 20:
+            return score = 9;
+          case 10:
+            return score = 10;
+          default:
+            return score;
+        }
+      }, []);
+
       const clickHandler = useCallback(() => {
         setPoints((prevPoints) => prevPoints + theScore());
         setIsVisible(false);
-      }, []);
+      }, [theScore]);
 
       return (
-
-        <div className="x">
+        <BubbleParent>
           {isVisible && (
             <Bubble
-              key={id}
-              ref={divRefs}
-              id={id}
-              className={`${"animate-bubble"} y`}
-              onClick={clickHandler}
-              style={{
-                width: str,
-                height: str,
-                backgroundColor: `${isBgColor}`,
-                border: `10px solid ${isBorderColor}`,
-              }}
-            >
-              <div>{theScore()}</div>
-            </Bubble>
+            key={id}
+            ref={divRefs}
+            id={id}
+            className={`${"animate-bubble"}`}
+            onClick={clickHandler}
+            style={{
+              width: str,
+              height: str,
+              backgroundColor: `${isBgColor}`,
+              border: `10px solid ${isBorderColor}`,
+            }}
+            animationDuration="2s"
+          >
+            <div>{theScore()}</div>
+          </Bubble>
           )}
-        </div>
+          </BubbleParent>
       );
     };
     setBubbles((prev) => [
@@ -179,8 +181,6 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     newUUID,
     isPaused,
     removeDiv,
-    customClass,
-    score,
     str,
     isBgColor,
     isBorderColor,
@@ -199,7 +199,7 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
       bubbleCreate();
     }, 2000);
     return () => clearInterval(interval);
-  }, [str, id, score, bubbles, addDiv, isBorderColor, isBgColor]);
+  }, [str, id, bubbles, addDiv, isBorderColor, isBgColor]);
 
   const toggleAnimation = () => {
     setIsPaused(!isPaused);
@@ -234,9 +234,32 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
   );
 };
 
+const xMotion = keyframes`
+  100% {
+    transform: translateX(calc(100vw - 100%));
+  }
+`;
+
+const yMotion = keyframes`
+100% {
+  transform: translateY(calc(100vh - 300px));
+}
+`;
+
+const xAnimation = css`
+  animation: ${xMotion} 10s linear infinite alternate;
+`;
+
+const yAnimation = css`
+  animation: ${yMotion} 7s linear infinite alternate;
+`;
+
 const BubbleContainer = styled.div`
-  height: 86.5vh;
-  overflow: hidden;
+`;
+
+const BubbleParent = styled.div<BubbleProps>`
+position: absolute;
+${xAnimation}
 `;
 
 const Bubble = styled.div<BubbleProps>`
@@ -244,7 +267,7 @@ border-radius: 50%;
 display: flex;
 align-items: center;
 justify-content: space-around;
-position: absolute;
+${yAnimation}
 animation-fill-mode: forwards;
 animation-play-state: ${(props) => (props.$paused ? "paused" : "running")};
 box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);

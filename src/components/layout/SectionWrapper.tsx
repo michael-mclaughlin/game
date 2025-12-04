@@ -1,21 +1,21 @@
-import React, { ReactElement } from "react";
+import React, { ReactNode } from "react";
 import styled from "styled-components";
 
-interface Section {
-    children: ReactElement;
+interface SectionProps {
+    children?: ReactNode;
     customClass?: string;
 }
-const SectionWrapper: React.FC<Section> = (props: Section) => {
+const SectionWrapper: React.FC<SectionProps> = (props: SectionProps) => {
     const {children, customClass} = props;
     return (
-        <Section className={`layout-section-wrapper ${customClass}`}>{children}</Section>
+        <SectionContainer className={`layout-section-wrapper ${customClass}`}>{children}</SectionContainer>
     );
 }
 
 
 
-const Section = styled.section`
+const SectionContainer = styled.section`
 
-`
+`;
 
 export default SectionWrapper;

@@ -1,23 +1,21 @@
-import React, { ReactElement } from "react";
+import React, { ReactNode } from "react";
 import styled from "styled-components";
 
 interface Div {
-    children: ReactElement;
-    customClass: string;
+    children?: ReactNode;
+    customClass?: string;
 }
 
-const DivWrapper: React.FC<Div> = (props: Div) => {
+const DivWrappers: React.FC<Div> = (props: Div) => {
     const {children, customClass} = props;
     return (
         <Div className={`layout-div-wrapper-${customClass}`}>{children}</Div>
     );
-}
+};
 
 
 
 const Div = styled.div`
-border: 10px solid blue;
-padding: 2rem;
-`
+`;
 
-export default DivWrapper;
+export default DivWrappers;
