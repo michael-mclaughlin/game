@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import styled, { css, keyframes } from "styled-components";
+import DivWrapper from './DivWrapper.tsx';
 
 interface CircleProps {
   children?: ReactElement;
