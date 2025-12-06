@@ -6,7 +6,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import styled, {css, keyframes} from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 
 interface CircleProps {
   children?: ReactElement;
@@ -51,7 +51,7 @@ const Timer: React.FC = () => {
 
 
   return (
-      <h1>Countdown: {secondsRemaining} seconds</h1>
+    <h1>Countdown: {secondsRemaining} seconds</h1>
   );
 };
 
@@ -64,8 +64,8 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
   const [points, setPoints] = useState<number>(0);
   const [isOver, setIsOver] = useState<boolean>(false);
   const divRefs = useRef<HTMLDivElement>(null);
-  
-  if(isBgColor === 'pink' && bubbles.length === 1) {
+
+  if (isBgColor === 'pink' && bubbles.length === 1) {
     setBgColor('red')
   }
   function getRandomInt(max: number) {
@@ -149,23 +149,23 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
         <BubbleParent>
           {isVisible && (
             <Bubble
-            key={id}
-            ref={divRefs}
-            id={id}
-            className={`${"animate-bubble"}`}
-            onClick={clickHandler}
-            style={{
-              width: str,
-              height: str,
-              backgroundColor: `${isBgColor}`,
-              border: `10px solid ${isBorderColor}`,
-            }}
-            animationDuration="2s"
-          >
-            <div>{theScore()}</div>
-          </Bubble>
+              key={id}
+              ref={divRefs}
+              id={id}
+              className={`${"animate-bubble"}`}
+              onClick={clickHandler}
+              style={{
+                width: str,
+                height: str,
+                backgroundColor: `${isBgColor}`,
+                border: `10px solid ${isBorderColor}`,
+              }}
+              animationDuration="2s"
+            >
+              <div>{theScore()}</div>
+            </Bubble>
           )}
-          </BubbleParent>
+        </BubbleParent>
       );
     };
     setBubbles((prev) => [
@@ -221,13 +221,11 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     <div
     >
       <Timer />
-      <BubbleContainer>
-        <h2>{points}</h2>
-        
-        <button onClick={toggleAnimation}>
+      <h2>{points}</h2>
+      <button onClick={toggleAnimation}>
           {isPaused ? "Pause Animation" : "Resume Animation "}
         </button>
-
+      <BubbleContainer>
         {isPaused && !isOver && [...bubbles]}
       </BubbleContainer>
     </div>
@@ -242,7 +240,7 @@ const xMotion = keyframes`
 
 const yMotion = keyframes`
 100% {
-  transform: translateY(calc(100vh - 300px));
+  transform: translateY(calc(100vh - 100%));
 }
 `;
 
@@ -270,7 +268,8 @@ justify-content: space-around;
 ${yAnimation}
 animation-fill-mode: forwards;
 animation-play-state: ${(props) => (props.$paused ? "paused" : "running")};
-box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);
+box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.7);
+
 `;
 
 export default Circle;
