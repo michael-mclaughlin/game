@@ -7,7 +7,11 @@ import React, {
   ReactNode,
 } from "react";
 import styled, { css, keyframes } from "styled-components";
-import DivWrapper from './DivWrapper.tsx';
+import DivWrapper from "../layout/DivWrapper.tsx";
+import SectionWrapper from "../layout/SectionWrapper.tsx";
+import Timer from "../custom/Timer.tsx";
+import { getRandomInt } from "../../utils/utils.tsx";
+import { generateRandomUUID } from "../../utils/utils.tsx";
 
 interface CircleProps {
   children?: ReactElement;
@@ -21,96 +25,32 @@ interface BubbleProps {
   animationTimingFunction?: string;
 }
 
-const Timer: React.FC = () => {
-  const initialTime = 120;
-  const [secondsRemaining, setSecondsRemaining] = useState(initialTime);
-
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    // Start the countdown interval
-    intervalRef.current = setInterval(() => {
-      setSecondsRemaining((prevTime) => prevTime - 1);
-    }, 1000);
-
-    // Cleanup function to clear the interval when the component unmounts
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (secondsRemaining <= 0) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current); // Stop the timer
-      }
-      setSecondsRemaining(0); // Ensure it displays 0
-    }
-  }, [secondsRemaining]);
-
-
-  return (
-    <h1>Countdown: {secondsRemaining} seconds</h1>
-  );
-};
+interface ItemProps {
+  id: string;
+  $paused?: boolean;
+  removeDiv: (itemId: string | number) => void;
+}
 
 const Circle: React.FC<CircleProps> = (props: CircleProps) => {
   const { id } = props;
   const [bubbles, setBubbles] = useState<ReactNode[]>([]);
-  const [isBgColor, setBgColor] = useState<string>("pink");
-  const [isBorderColor, setIsBorderColor] = useState<string>("#2b78e4");
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [points, setPoints] = useState<number>(0);
   const [isOver, setIsOver] = useState<boolean>(false);
   const divRefs = useRef<HTMLDivElement>(null);
 
-  if (isBgColor === 'pink' && bubbles.length === 1) {
-    setBgColor('red')
-  }
-  function getRandomInt(max: number) {
-    return Math.floor(Math.ceil(Math.random() * max) * 10);
-  }
   let str = getRandomInt(10);
 
-  function generateRandomUUID(): string {
-    if (typeof crypto !== "undefined" && crypto.randomUUID) {
-      return crypto.randomUUID();
-    } else {
-      // Fallback for environments where crypto.randomUUID is not available
-      // This method is less secure and should only be used as a last resort
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-          const r = (Math.random() * 16) | 0;
-          const v = c === "x" ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        }
-      );
-    }
-  }
-
   const newUUID = generateRandomUUID();
-
-  const generateRandomHexColor = () => {
-    // Generate a random number between 0 and 16777215 (FFFFFF in hex)
-    const randomColorNumber = Math.floor(Math.random() * 16777215);
-
-    // Convert the number to a hexadecimal string
-    let hex = randomColorNumber.toString(16);
-
-    // Pad with leading zeros if the hex string is less than 6 characters
-    return (hex = `#${hex.padStart(6, "0")}`);
-  };
 
   const removeDiv = useCallback((itemId: string | number) => {
     setBubbles(bubbles.filter((id) => id !== itemId));
   }, [bubbles]);
 
   const addDiv = useCallback(() => {
-    const Item = ({ id, $paused, removeDiv }) => {
+    const Item: React.FC<ItemProps> = (props: ItemProps) => {
       const [isVisible, setIsVisible] = useState<boolean>(true);
+      const { id } = props;
 
       const theScore = useCallback(() => {
         let score: number = 0;
@@ -141,7 +81,7 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
         }
       }, []);
 
-      const clickHandler = useCallback(() => {
+      const scoreClickHandler = useCallback(() => {
         setPoints((prevPoints) => prevPoints + theScore());
         setIsVisible(false);
       }, [theScore]);
@@ -154,17 +94,12 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
               ref={divRefs}
               id={id}
               className={`${"animate-bubble"}`}
-              onClick={clickHandler}
+              onClick={scoreClickHandler}
               style={{
                 width: str,
                 height: str,
-                backgroundColor: `${isBgColor}`,
-                border: `10px solid ${isBorderColor}`,
               }}
-              animationDuration="2s"
-            >
-              <div>{theScore()}</div>
-            </Bubble>
+            />
           )}
         </BubbleParent>
       );
@@ -183,24 +118,14 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     isPaused,
     removeDiv,
     str,
-    isBgColor,
-    isBorderColor,
   ]);
 
   useEffect(() => {
-    const bubbleCreate = () => {
-      if (divRefs.current) {
-        setBgColor(generateRandomHexColor());
-        setIsBorderColor(generateRandomHexColor());
-      }
-    };
-
     const interval = setInterval(() => {
       addDiv();
-      bubbleCreate();
     }, 2000);
     return () => clearInterval(interval);
-  }, [str, id, bubbles, addDiv, isBorderColor, isBgColor]);
+  }, [str, id, bubbles, addDiv]);
 
   const toggleAnimation = () => {
     setIsPaused(!isPaused);
@@ -219,17 +144,19 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
   }, []);
 
   return (
-    <div
-    >
-      <Timer />
-      <h2>{points}</h2>
-      <button onClick={toggleAnimation}>
+    <SectionWrapper>
+      <DivWrapper
+      >
+        <Timer />
+        <h2>{points}</h2>
+        <button onClick={toggleAnimation}>
           {isPaused ? "Pause Animation" : "Resume Animation "}
         </button>
+      </DivWrapper>
       <BubbleContainer>
-        {isPaused && !isOver && [...bubbles]}
-      </BubbleContainer>
-    </div>
+          {isPaused && !isOver && [...bubbles]}
+        </BubbleContainer>
+    </SectionWrapper>
   );
 };
 
@@ -241,7 +168,7 @@ const xMotion = keyframes`
 
 const yMotion = keyframes`
 100% {
-  transform: translateY(calc(100vh - 100%));
+  transform: translateY(calc(80vh - 100%));
 }
 `;
 
@@ -269,8 +196,23 @@ justify-content: space-around;
 ${yAnimation}
 animation-fill-mode: forwards;
 animation-play-state: ${(props) => (props.$paused ? "paused" : "running")};
-box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.7);
+box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6), inset 0px 10px 30px 5px rgba(255, 255, 255, 0.85);
+:after {
+  background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,0.5)), color-stop(70%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* IE10+ */
+    background: radial-gradient(ellipse at center,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
+-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%;
+	content: "";
+    -webkit-box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);
+	-moz-box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);
+	box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);    }
 `;
 
 export default Circle;
