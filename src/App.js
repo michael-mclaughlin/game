@@ -1,17 +1,20 @@
 import React from 'react';
-import './App.css';
+import './index.css';
 import SectionWrapper from './components/layout/SectionWrapper.tsx';
 import Circle from './components/items/Circle.tsx';
-
+import DivWrapper from './components/layout/DivWrapper.tsx';
+import SideDrawerContainer from './components/custom/SideDrawerContainer.tsx';
 function App() {
+
   return (
-    <div className="App">
+    <DivWrapper className="App">
       {/* <header className="App-header">
       </header> */}
+      <SideDrawerContainer />
       <SectionWrapper customClass='circle-wrapper'>
-        <Circle id={'app-circle'}/>
+        <Circle id={'app-circle'} />
       </SectionWrapper>
-    </div>
+    </DivWrapper>
   );
 }
 

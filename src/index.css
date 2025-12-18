@@ -8,8 +8,8 @@ body {
   height: 100%;
   background-image: url('./components/images/rainbow-striped-tent-inside-circus.jpg');
   background-repeat: no-repeat;
-        background-position: top center;
-        background-size: cover; 
+  background-position: top center;
+  background-size: 100% 100%;
 }
 
 code {
@@ -23,13 +23,11 @@ code {
   width: 100%;
   z-index: 1;
 }
- .App {
-  height: 100vh;
-  overflow: hidden;
- }
 
- .circle-wrapper {
+.circle-wrapper {
   position: relative;
   height: 100vh;
   overflow: hidden;
- }
+}
+
+
