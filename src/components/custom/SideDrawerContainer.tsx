@@ -14,7 +14,7 @@ const SideDrawerContainer: React.FC = () => {
 
   const toggleDrawer = useCallback(() => {
     setIsDrawerOpen(!isDrawerOpen);
-  }, []);
+  }, [isDrawerOpen]);
 
   const latestScore = useCallback(() => {
     setPoints((prevPoints) => prevPoints + theScore());
@@ -46,7 +46,6 @@ const SideDrawerContainer: React.FC = () => {
   return (
     <>
       <DivWrapper customClass='drawer-wrapper'>
-        {/* <button className='open-close-button' onClick={toggleDrawer}>Open Drawer</button> */}
         <SideDrawer customClass='minus-score-clown' isOpen={isDrawerOpen} onClose={toggleDrawer}>
           <DivWrapper customClass='drawer-header'></DivWrapper>
           <h2>Drawer Content</h2>
