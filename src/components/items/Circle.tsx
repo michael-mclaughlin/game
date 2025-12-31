@@ -12,6 +12,7 @@ import SectionWrapper from "../layout/SectionWrapper.tsx";
 import Timer from "../custom/Timer.tsx";
 import { getRandomInt } from "../../utils/utils.tsx";
 import { generateRandomUUID } from "../../utils/utils.tsx";
+import '../../styles/bubble.css';
 
 interface CircleProps {
   children?: ReactElement;
@@ -37,6 +38,7 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [points, setPoints] = useState<number>(0);
   const [isOver, setIsOver] = useState<boolean>(false);
+  const [xPosition, setXPosition] = useState<number>(0);
   const divRefs = useRef<HTMLDivElement>(null);
 
   let str = getRandomInt(10);
@@ -89,17 +91,20 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
       return (
         <BubbleParent>
           {isVisible && (
-            <Bubble
-              key={id}
-              ref={divRefs}
-              id={id}
-              className={`${"animate-bubble"}`}
-              onClick={scoreClickHandler}
-              style={{
-                width: str,
-                height: str,
-              }}
-            />
+            <BubbleWrapper>
+              <Bubble
+                key={id}
+                ref={divRefs}
+                id={id}
+                className={`${'animate-bubble bubble'}`}
+                onClick={scoreClickHandler}
+                style={{
+                  width: str,
+                  height: str,
+                  right: xPosition + 'px',
+                }}
+              />
+            </BubbleWrapper>
           )}
         </BubbleParent>
       );
@@ -118,14 +123,29 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
     isPaused,
     removeDiv,
     str,
+    xPosition,
   ]);
 
   useEffect(() => {
+    const bubbleXPositionCreate = () => {
+      if (divRefs.current) {
+        const windowWidth = window.innerWidth;
+        const xPos = Math.floor(Math.random() * windowWidth );
+        setXPosition(xPos);
+      }
+    };
     const interval = setInterval(() => {
       addDiv();
-    }, 2000);
+      bubbleXPositionCreate();
+    }, 1000);
     return () => clearInterval(interval);
-  }, [str, id, bubbles, addDiv]);
+  }, [
+    str,
+    id,
+    bubbles,
+    addDiv,
+    xPosition,
+  ]);
 
   const toggleAnimation = () => {
     setIsPaused(!isPaused);
@@ -154,8 +174,8 @@ const Circle: React.FC<CircleProps> = (props: CircleProps) => {
         </button>
       </DivWrapper>
       <BubbleContainer>
-          {isPaused && !isOver && [...bubbles]}
-        </BubbleContainer>
+        {isPaused && !isOver && [...bubbles]}
+      </BubbleContainer>
     </SectionWrapper>
   );
 };
@@ -172,15 +192,50 @@ const yMotion = keyframes`
 }
 `;
 
+const bubbleSizeAnimation = keyframes`
+  0% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  20% {
+    -webkit-transform: scaleY(0.95) scaleX(1.05);
+    transform: scaleY(0.95) scaleX(1.05);
+  }
+  48% {
+    -webkit-transform: scaleY(1.1) scaleX(0.9);
+    transform: scaleY(1.1) scaleX(0.9); 
+  }
+  68% {
+    -webkit-transform: scaleY(0.98) scaleX(1.02);
+    transform: scaleY(0.98) scaleX(1.02); 
+  }
+  80% {
+    -webkit-transform: scaleY(1.02) scaleX(0.98);
+    transform: scaleY(1.02) scaleX(0.98); 
+  }
+  97%, 100% {
+    -webkit-transform: scale(1);
+    transform: scale(1); 
+  }
+`;
+
 const xAnimation = css`
-  animation: ${xMotion} 10s linear infinite alternate;
+  animation: ${xMotion} 14s linear infinite;
 `;
 
 const yAnimation = css`
-  animation: ${yMotion} 7s linear infinite alternate;
+  animation: ${yMotion} 4s linear infinite alternate;
+`;
+
+const bubbleShapeAnimation = css`
+  animation: ${bubbleSizeAnimation} 2s ease-in-out infinite alternate;
 `;
 
 const BubbleContainer = styled.div`
+`;
+
+const BubbleWrapper = styled.div`
+${bubbleShapeAnimation}
 `;
 
 const BubbleParent = styled.div<BubbleProps>`
@@ -194,25 +249,10 @@ display: flex;
 align-items: center;
 justify-content: space-around;
 ${yAnimation}
-animation-fill-mode: forwards;
-animation-play-state: ${(props) => (props.$paused ? "paused" : "running")};
-box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6), inset 0px 10px 30px 5px rgba(255, 255, 255, 0.85);
-:after {
-  background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%); /* FF3.6+ */
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,0.5)), color-stop(70%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
-    background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* IE10+ */
-    background: radial-gradient(ellipse at center,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
--webkit-border-radius: 50%;
-	-moz-border-radius: 50%;
-	border-radius: 50%;
-	content: "";
-    -webkit-box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);
-	-moz-box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);
-	box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3);    }
+animation-play-state: ${(props) => (props.$paused ? 'paused' : 'running')};
+box-shadow: -1px -1px 5px rgb(41 169 139 / 28%);
+border-left: 2px solid white;
+border-right: 3px solid #7b027747;
 `;
 
 export default Circle;
